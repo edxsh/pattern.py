@@ -1,19 +1,20 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import sys
 import struct
 
 def print_help():
-    print 'Usage: %s (create | offset) <value> <buflen>' % sys.argv[0]
+    print(f'Usage: {sys.argv[0]} (create | offset) <value> <buflen>')
 
 def pattern_create(length = 8192):
     pattern = ''
     parts = ['A', 'a', '0']
     try:
-        if not isinstance(length, (int, long)) and length.startswith('0x'):
+        if not isinstance(length, int) and length.startswith('0x'):
             length = int(length, 16)
-        elif not isinstance(length, (int, long)):
+        elif not isinstance(length, int):
             length = int(length, 10)
-    except ValueError:
+    except ValueError as e:
+        print(e)
         print_help()
         sys.exit(254)
     while len(pattern) != length:
@@ -30,11 +31,12 @@ def pattern_create(length = 8192):
                         parts[0] = 'A'
     return pattern
 
-def pattern_offset(value, length = 8192):
+def pattern_offset(length ,value):
     try:
-        if not isinstance(value, (int, long)) and value.startswith('0x'):
-            value = struct.pack('<I', int(value, 16)).strip('\x00')
-    except ValueError:
+        if value.startswith('0x'):
+            value = struct.pack('<I', int(value, 16)).strip(b'\x00')
+    except ValueError as e:
+        print(e)
         print_help()
         sys.exit(254)
     pattern = pattern_create(length)
@@ -52,9 +54,9 @@ def main():
     num_value = sys.argv[2]
 
     if command == 'create':
-        print pattern_create(num_value)
+        print(pattern_create(num_value))
     elif len(sys.argv) == 4:
-        print pattern_offset(num_value, sys.argv[3])  
+        print(pattern_offset(num_value, sys.argv[3]))
 
 if __name__ == '__main__':
     main()
